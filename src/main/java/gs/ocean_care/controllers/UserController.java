@@ -4,20 +4,21 @@ import gs.ocean_care.dtos.auth.AuthDto;
 import gs.ocean_care.dtos.auth.RequestRefreshTokenDto;
 import gs.ocean_care.dtos.auth.TokenResponseDto;
 import gs.ocean_care.dtos.user.RegisterUserDto;
-import gs.ocean_care.infra.security.dataTokenJwt;
-import gs.ocean_care.models.User;
+import gs.ocean_care.dtos.user.UpdateUserDto;
+import gs.ocean_care.dtos.user.UserDto;
 import gs.ocean_care.services.AuthService;
 import gs.ocean_care.services.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
@@ -47,11 +48,37 @@ public class UserController {
         return ResponseEntity.ok(authService.getToken(data));
     }
 
-
     @PostMapping("/refreshToken")
     public ResponseEntity<TokenResponseDto> login(@RequestBody RequestRefreshTokenDto data){
         var token = authService.getRefreshToken(data.refreshToken());
 
         return ResponseEntity.ok(token);
+    }
+
+    @PutMapping("/update/{id}")
+    @Transactional
+    @SecurityRequirement(name = "bearer-key")
+    public ResponseEntity<UserDto> update(@PathVariable Long id, @RequestBody @Valid UpdateUserDto data) {
+        var updatedUser = userService.update(id, data);
+
+        return ResponseEntity.ok(updatedUser);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    @Transactional
+    @SecurityRequirement(name = "bearer-key")
+    public ResponseEntity<Object> delete(@PathVariable Long id) {
+        userService.delete(id);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/list")
+    @Transactional
+    @SecurityRequirement(name = "bearer-key")
+    public ResponseEntity<Page<UserDto>> list(@PageableDefault(size = 20, page = 0, sort = {"reportedTrash"}) Pageable pageable) {
+        var users = userService.findAll(pageable);
+
+        return ResponseEntity.ok(users);
     }
 }

@@ -1,6 +1,7 @@
 package gs.ocean_care.models;
 
 import gs.ocean_care.dtos.user.RegisterUserDto;
+import gs.ocean_care.dtos.user.UpdateUserDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,13 +30,33 @@ public class User implements UserDetails {
     private String password;
     @Column(nullable = false)
     private String confirm_password;
+    @Column(nullable = false)
+    private Integer reportedTrash;
+    private boolean active;
 
     public User(RegisterUserDto data) {
         this.name = data.name();
         this.email = data.email();
         this.password = data.password();
         this.confirm_password = data.confirm_password();
+        this.reportedTrash = 0;
     };
+
+    public void updateUser(UpdateUserDto data) {
+        if (data.name() != null) {
+            this.name = data.name();
+        }
+        if (data.email() != null) {
+            this.email = data.email();
+        }
+        if (data.reportedTrash() != null) {
+            this.reportedTrash = data.reportedTrash();
+        }
+    }
+
+    public void softDelete() {
+        this.active = false;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
