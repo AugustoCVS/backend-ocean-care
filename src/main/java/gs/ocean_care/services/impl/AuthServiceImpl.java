@@ -6,11 +6,14 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import gs.ocean_care.dtos.auth.AuthDto;
 import gs.ocean_care.dtos.auth.TokenResponseDto;
+import gs.ocean_care.infra.exception.UnauthorizedException;
 import gs.ocean_care.models.User;
 import gs.ocean_care.repositories.UserRepository;
 import gs.ocean_care.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -21,30 +24,34 @@ import java.time.ZoneOffset;
 
 @Service
 public class AuthServiceImpl implements AuthService {
-
-    @Value("${api.security.token.expiration-time}")
-    private Long expirationTime;
-
     @Autowired
     private UserRepository userRepository;
+
+    @Value("${api.security.token.secret}")
+    private String secret;
+
+    @Value("${api.security.token.expiration-time}")
+    private Integer tokenExpiration;
+
+    @Value("${api.security.refresh-token.expiration-time}")
+    private Integer refreshTokenExpiration;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return userRepository.findByEmail(email);
     }
 
-    @Value("${api.security.token.secret}")
-    private String secret;
-
+    @Override
     public TokenResponseDto getToken(AuthDto data){
         User user = userRepository.findByEmail(data.email());
 
         return TokenResponseDto.builder()
-                .accessToken(generateToken(user))
+                .token(generateToken(user, tokenExpiration))
+                .refreshToken(generateToken(user, refreshTokenExpiration))
                 .build();
     }
 
-    public String generateToken(User user){
+    public String generateToken(User user, Integer expiration){
         try {
             var algorithm = Algorithm.HMAC256(secret);
             return JWT.create()
@@ -53,7 +60,7 @@ public class AuthServiceImpl implements AuthService {
                     .withClaim("id", user.getId())
                     .withClaim("email", user.getEmail())
                     .withClaim("name", user.getName())
-                    .withExpiresAt(tokenExpiration())
+                    .withExpiresAt(tokenExpiration(expiration))
                     .sign(algorithm);
         }catch (JWTCreationException exception){
             throw new RuntimeException("Erro ao gerar token jwt", exception);
@@ -74,11 +81,26 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    private Instant tokenExpiration(){
-        return LocalDateTime.now().plusHours(1).toInstant(ZoneOffset.of("-03:00"));
+    private Instant tokenExpiration(Integer expiration){
+        return LocalDateTime.now().plusHours(expiration).toInstant(ZoneOffset.of("-03:00"));
     }
 
-    private Instant refreshTokenExpiration(){
-        return LocalDateTime.now().plusDays(15).toInstant(ZoneOffset.of("-03:00"));
+    public TokenResponseDto getRefreshToken(String refreshToken){
+
+        String subject = validateToken(refreshToken);
+        User user = userRepository.findByEmail(subject);
+
+        if(user == null) {
+            throw new UnauthorizedException("Falha ao gerar o refresh token");
+        }
+
+        var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        return TokenResponseDto.builder()
+                .token(generateToken(user, tokenExpiration))
+                .refreshToken(generateToken(user, refreshTokenExpiration))
+                .build();
     }
 }

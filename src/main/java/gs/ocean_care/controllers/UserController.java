@@ -1,6 +1,7 @@
 package gs.ocean_care.controllers;
 
 import gs.ocean_care.dtos.auth.AuthDto;
+import gs.ocean_care.dtos.auth.RequestRefreshTokenDto;
 import gs.ocean_care.dtos.auth.TokenResponseDto;
 import gs.ocean_care.dtos.user.RegisterUserDto;
 import gs.ocean_care.infra.security.dataTokenJwt;
@@ -46,4 +47,11 @@ public class UserController {
         return ResponseEntity.ok(authService.getToken(data));
     }
 
+
+    @PostMapping("/refreshToken")
+    public ResponseEntity<TokenResponseDto> login(@RequestBody RequestRefreshTokenDto data){
+        var token = authService.getRefreshToken(data.refreshToken());
+
+        return ResponseEntity.ok(token);
+    }
 }

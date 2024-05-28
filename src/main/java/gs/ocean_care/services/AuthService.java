@@ -9,4 +9,5 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 public interface AuthService extends UserDetailsService {
     public String validateToken(String token);
     public TokenResponseDto getToken(AuthDto data);
+    public TokenResponseDto getRefreshToken(String refreshToken);
 }
