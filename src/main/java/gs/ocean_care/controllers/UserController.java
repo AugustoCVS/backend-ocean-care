@@ -1,6 +1,7 @@
 package gs.ocean_care.controllers;
 
 import gs.ocean_care.dtos.auth.AuthDto;
+import gs.ocean_care.dtos.auth.TokenResponseDto;
 import gs.ocean_care.dtos.user.RegisterUserDto;
 import gs.ocean_care.infra.security.dataTokenJwt;
 import gs.ocean_care.models.User;
@@ -38,13 +39,11 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<dataTokenJwt> login(@RequestBody AuthDto data){
+    public ResponseEntity<TokenResponseDto> login(@RequestBody AuthDto data){
         var userAuthToken = new UsernamePasswordAuthenticationToken(data.email(), data.password());
-        var auth = manager.authenticate(userAuthToken);
+        manager.authenticate(userAuthToken);
 
-        var tokenJwt = authService.generateToken((User) auth.getPrincipal());
-
-        return ResponseEntity.ok(new dataTokenJwt(tokenJwt));
+        return ResponseEntity.ok(authService.getToken(data));
     }
 
 }
