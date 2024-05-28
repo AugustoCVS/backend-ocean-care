@@ -8,7 +8,9 @@ import gs.ocean_care.repositories.UserRepository;
 import gs.ocean_care.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -49,6 +51,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserDto> findAll(Pageable pageable) {
+        Sort sort = Sort.by("reportedTrash").descending();
+        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
         return repository.findAll(pageable).map(UserDto::new);
     }
 }

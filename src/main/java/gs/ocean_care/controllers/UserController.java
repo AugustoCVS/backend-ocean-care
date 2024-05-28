@@ -76,7 +76,7 @@ public class UserController {
     @GetMapping("/list")
     @Transactional
     @SecurityRequirement(name = "bearer-key")
-    public ResponseEntity<Page<UserDto>> list(@PageableDefault(size = 20, page = 0, sort = {"reportedTrash"}) Pageable pageable) {
+    public ResponseEntity<Page<UserDto>> list(@PageableDefault(size = 20, page = 0) Pageable pageable) {
         var users = userService.findAll(pageable);
 
         return ResponseEntity.ok(users);
