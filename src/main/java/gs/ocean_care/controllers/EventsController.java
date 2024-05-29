@@ -58,7 +58,7 @@ public class EventsController {
         Page<EventsDto> events;
 
         if (name != null) {
-            events = eventService.findAllByName(name);
+            events = eventService.findAllByName(name, pageable);
         } else {
             events = eventService.findAll(pageable);
         }
