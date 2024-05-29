@@ -1,6 +1,7 @@
 package gs.ocean_care.models;
 
 import gs.ocean_care.dtos.events.RegisterEventsDto;
+import gs.ocean_care.dtos.events.UpdateEventDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,7 +49,7 @@ public class Events {
         this.active = true;
     }
 
-    public void updateEvent(RegisterEventsDto data){
+    public void updateEvent(UpdateEventDto data){
         if(data.name() != null){
             this.name = data.name();
         }
