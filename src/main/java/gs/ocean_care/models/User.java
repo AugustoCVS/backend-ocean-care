@@ -34,6 +34,14 @@ public class User implements UserDetails {
     private Integer reportedTrash;
     private boolean active;
 
+    @ManyToMany
+    @JoinTable(
+            name = "events_participants",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "event_id")
+    )
+    private List<Events> events;
+
     public User(RegisterUserDto data) {
         this.name = data.name();
         this.email = data.email();
