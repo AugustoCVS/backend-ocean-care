@@ -1,13 +1,15 @@
 package gs.ocean_care.models;
 
+import gs.ocean_care.dtos.events.EventsDto;
 import gs.ocean_care.dtos.events.RegisterEventsDto;
 import gs.ocean_care.dtos.events.UpdateEventDto;
+import gs.ocean_care.dtos.user.UserDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -17,7 +19,7 @@ import java.util.List;
 @Table(name = "events")
 public class Events {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
     private String name;
@@ -26,17 +28,17 @@ public class Events {
     @Column(nullable = false)
     private String location;
     @Column(nullable = false)
-    private LocalDateTime startDate;
+    private LocalDate startDate;
     @Column(nullable = false)
-    private LocalDateTime endDate;
+    private LocalDate endDate;
     @Column(nullable = false)
     private boolean active;
 
     @ManyToMany
     @JoinTable(
             name = "events_participants",
-            joinColumns = @JoinColumn(name = "event_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
+            joinColumns = @JoinColumn(name = "eventId"),
+            inverseJoinColumns = @JoinColumn(name = "userId")
     )
     private List<User> users;
 
@@ -47,6 +49,18 @@ public class Events {
         this.startDate = data.startDate();
         this.endDate = data.endDate();
         this.active = true;
+    }
+
+    public EventsDto toDto() {
+        return new EventsDto(
+                this.id,
+                this.name,
+                this.description,
+                this.location,
+                this.startDate,
+                this.endDate,
+                this.users.stream().map(UserDto::new).toList()
+        );
     }
 
     public void updateEvent(UpdateEventDto data){
@@ -69,5 +83,10 @@ public class Events {
 
     public void softDelete(){
         this.active = false;
+    }
+
+
+    public void subscribeUserOnEvent(User user){
+        this.users.add(user);
     }
 }

@@ -19,4 +19,6 @@ public interface EventsService {
     public EventsDto update(Long id, UpdateEventDto data);
 
     public void register(RegisterEventsDto data);
+
+    public void subscribeUser(Long eventId, Long userId);
 }

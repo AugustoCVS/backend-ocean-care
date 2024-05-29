@@ -19,13 +19,13 @@ import org.springframework.web.bind.annotation.*;
 public class EventsController {
 
     @Autowired
-    private EventsService eventService;
+    private EventsService eventsService;
 
     @PostMapping("/register")
     @Transactional
     @SecurityRequirement(name = "bearer-key")
     public ResponseEntity<Object> register(@RequestBody @Valid RegisterEventsDto data) {
-        eventService.register(data);
+        eventsService.register(data);
 
         return ResponseEntity.ok().build();
     }
@@ -34,7 +34,7 @@ public class EventsController {
     @Transactional
     @SecurityRequirement(name = "bearer-key")
     public ResponseEntity<Object> update(@PathVariable Long id, @RequestBody @Valid UpdateEventDto data) {
-        var updatedEvent = eventService.update(id, data);
+        var updatedEvent = eventsService.update(id, data);
 
         return ResponseEntity.ok(updatedEvent);
     }
@@ -43,7 +43,7 @@ public class EventsController {
     @Transactional
     @SecurityRequirement(name = "bearer-key")
     public ResponseEntity<Object> delete(@PathVariable Long id) {
-        eventService.delete(id);
+        eventsService.delete(id);
 
         return ResponseEntity.ok().build();
     }
@@ -58,9 +58,9 @@ public class EventsController {
         Page<EventsDto> events;
 
         if (name != null) {
-            events = eventService.findAllByName(name, pageable);
+            events = eventsService.findAllByName(name, pageable);
         } else {
-            events = eventService.findAll(pageable);
+            events = eventsService.findAll(pageable);
         }
 
         return ResponseEntity.ok(events);
@@ -73,9 +73,17 @@ public class EventsController {
             @PathVariable Long userId,
             @PageableDefault(size = 20, page = 0) Pageable pageable
     ) {
-        var events = eventService.findAllByUserId(userId, pageable);
+        var events = eventsService.findAllByUserId(userId, pageable);
 
         return ResponseEntity.ok(events);
     }
 
+    @PostMapping("/subscribe/{eventId}/{userId}")
+    @Transactional
+    @SecurityRequirement(name = "bearer-key")
+    public ResponseEntity<Object> subscribeUser(@PathVariable Long eventId, @PathVariable Long userId) {
+        eventsService.subscribeUser(eventId, userId);
+
+        return ResponseEntity.ok().build();
+    }
 }
