@@ -37,6 +37,9 @@ public class User implements UserDetails {
     @ManyToMany(mappedBy = "users")
     private List<Events> events;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Reports> reports;
+
     public User(RegisterUserDto data) {
         this.name = data.name();
         this.email = data.email();
