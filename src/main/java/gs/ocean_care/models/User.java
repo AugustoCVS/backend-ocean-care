@@ -34,6 +34,9 @@ public class User implements UserDetails {
     private Integer reportedTrash;
     private boolean active;
 
+    @ManyToMany(mappedBy = "users")
+    private List<Events> events;
+
     public User(RegisterUserDto data) {
         this.name = data.name();
         this.email = data.email();
