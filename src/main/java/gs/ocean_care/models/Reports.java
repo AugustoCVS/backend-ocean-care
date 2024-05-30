@@ -57,4 +57,5 @@ public class Reports {
     public void softDelete(){
         this.active = false;
     }
+
 }

@@ -12,8 +12,7 @@ public interface ReportsService {
 
     public Page<ReportsDto> findAllByUserId(Long userId, Pageable pageable);
 
-    public RegisterReportDto register(RegisterReportDto data);
-
+    public RegisterReportDto register(Long userId, RegisterReportDto data);
 
     public ReportsDto update(Long id, UpdateReportDto data);
 

@@ -2,9 +2,12 @@ package gs.ocean_care.services.impl;
 
 import gs.ocean_care.dtos.reports.RegisterReportDto;
 import gs.ocean_care.dtos.reports.ReportsDto;
+import gs.ocean_care.dtos.reports.ReportsType;
 import gs.ocean_care.dtos.reports.UpdateReportDto;
 import gs.ocean_care.models.Reports;
+import gs.ocean_care.models.User;
 import gs.ocean_care.repositories.ReportsRepository;
+import gs.ocean_care.repositories.UserRepository;
 import gs.ocean_care.services.ReportsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,6 +20,9 @@ public class ReportsServiceImpl implements ReportsService {
     @Autowired
     private ReportsRepository repository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Override
     public Page<ReportsDto> findAll(Pageable pageable) {
         return repository.findAllByActiveTrue(pageable);
@@ -28,8 +34,16 @@ public class ReportsServiceImpl implements ReportsService {
     }
 
     @Override
-    public RegisterReportDto register(RegisterReportDto data){
+    public RegisterReportDto register(Long userId, RegisterReportDto data){
         Reports report = new Reports(data);
+        User user = userRepository.getReferenceById(userId);
+
+        report.setUser(user);
+
+        Integer points = ReportsType.getPoints(data.type());
+        user.setReportedTrash(user.getReportedTrash() + points);
+
+        userRepository.save(user);
         repository.save(report);
 
         return null;
