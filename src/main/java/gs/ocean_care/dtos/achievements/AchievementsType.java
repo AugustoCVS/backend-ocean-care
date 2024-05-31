@@ -1,5 +1,8 @@
 package gs.ocean_care.dtos.achievements;
 
+import lombok.Getter;
+
+@Getter
 public enum AchievementsType {
     FiftyReports("fiftyReports", 50),
     HundredReports("hundredReports", 100),
@@ -17,8 +20,5 @@ public enum AchievementsType {
     AchievementsType(String type, Integer points) {
         this.type = type;
         this.points = points;
-    }
-    public static Integer getPoints(AchievementsType type) {
-        return type.points;
     }
 }
