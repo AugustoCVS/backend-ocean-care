@@ -1,5 +1,6 @@
 package gs.ocean_care.models;
 
+import gs.ocean_care.dtos.achievements.AchievementsType;
 import gs.ocean_care.dtos.user.RegisterUserDto;
 import gs.ocean_care.dtos.user.UpdateUserDto;
 import jakarta.persistence.*;
@@ -10,6 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -33,6 +35,7 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Integer reportedTrash;
     private boolean active;
+    private List<AchievementsType> achievements = new ArrayList<>();
 
     @ManyToMany(mappedBy = "users")
     private List<Events> events;
@@ -40,15 +43,14 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Reports> reports;
 
-    @ManyToMany(mappedBy = "users")
-    private List<Achievements> achievements;
-
     public User(RegisterUserDto data) {
         this.name = data.name();
         this.email = data.email();
         this.password = data.password();
         this.confirm_password = data.confirm_password();
         this.reportedTrash = 0;
+        this.active = true;
+        this.achievements = new ArrayList<>();
     };
 
     public void updateUser(UpdateUserDto data) {

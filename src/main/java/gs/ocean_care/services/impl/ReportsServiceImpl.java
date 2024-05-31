@@ -1,5 +1,6 @@
 package gs.ocean_care.services.impl;
 
+import gs.ocean_care.dtos.achievements.AchievementsType;
 import gs.ocean_care.dtos.reports.RegisterReportDto;
 import gs.ocean_care.dtos.reports.ReportsDto;
 import gs.ocean_care.dtos.reports.ReportsType;
@@ -34,7 +35,7 @@ public class ReportsServiceImpl implements ReportsService {
     }
 
     @Override
-    public RegisterReportDto register(Long userId, RegisterReportDto data){
+    public RegisterReportDto register(Long userId, RegisterReportDto data) {
         Reports report = new Reports(data);
         User user = userRepository.getReferenceById(userId);
 
@@ -46,7 +47,19 @@ public class ReportsServiceImpl implements ReportsService {
         userRepository.save(user);
         repository.save(report);
 
+        checkAndGrantAchievements(user);
+
         return null;
+    }
+
+    private void checkAndGrantAchievements(User user) {
+        for (AchievementsType type : AchievementsType.values()) {
+            if (user.getReportedTrash() >= type.getPoints() && !user.getAchievements().contains(type)) {
+                user.getAchievements().add(type);
+                userRepository.save(user);
+                System.out.println("User " + user.getId() + " has earned the achievement: " + type.name());
+            }
+        }
     }
 
     @Override
