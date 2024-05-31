@@ -40,6 +40,9 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Reports> reports;
 
+    @ManyToMany(mappedBy = "users")
+    private List<Achievements> achievements;
+
     public User(RegisterUserDto data) {
         this.name = data.name();
         this.email = data.email();
