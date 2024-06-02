@@ -81,4 +81,13 @@ public class UserController {
 
         return ResponseEntity.ok(users);
     }
+
+    @GetMapping("/{id}")
+    @Transactional
+    @SecurityRequirement(name = "bearer-key")
+    public ResponseEntity<UserDto> findById(@PathVariable Long id) {
+        var user = userService.findById(id);
+
+        return ResponseEntity.ok(user);
+    }
 }
