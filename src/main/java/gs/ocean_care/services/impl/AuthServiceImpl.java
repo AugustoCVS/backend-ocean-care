@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import gs.ocean_care.dtos.achievements.AchievementsType;
 import gs.ocean_care.dtos.auth.AuthDto;
 import gs.ocean_care.dtos.auth.TokenResponseDto;
 import gs.ocean_care.infra.exception.UnauthorizedException;
@@ -21,6 +22,8 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -54,12 +57,18 @@ public class AuthServiceImpl implements AuthService {
     public String generateToken(User user, Integer expiration){
         try {
             var algorithm = Algorithm.HMAC256(secret);
+            List<String> achievementsAsString = user.getAchievements().stream()
+                    .map(AchievementsType::name)
+                    .collect(Collectors.toList());
+
             return JWT.create()
                     .withIssuer("API OceanCare")
                     .withSubject(user.getEmail())
                     .withClaim("id", user.getId())
                     .withClaim("email", user.getEmail())
                     .withClaim("name", user.getName())
+                    .withClaim("reportedTrash", user.getReportedTrash())
+                    .withClaim("achievements", achievementsAsString)
                     .withExpiresAt(tokenExpiration(expiration))
                     .sign(algorithm);
         }catch (JWTCreationException exception){
@@ -69,6 +78,7 @@ public class AuthServiceImpl implements AuthService {
 
     public String validateToken(String tokenJWT) {
         try {
+            System.out.println("Token JWT: " + tokenJWT);
             var algorithm = Algorithm.HMAC256(secret);
             return JWT.require(algorithm)
                     .withIssuer("API OceanCare")
@@ -77,7 +87,7 @@ public class AuthServiceImpl implements AuthService {
                     .getSubject();
 
         } catch (JWTVerificationException exception){
-            throw new RuntimeException("Token JWT inválido ou expirado");
+            throw new UnauthorizedException("Token JWT inválido ou expirado");
         }
     }
 

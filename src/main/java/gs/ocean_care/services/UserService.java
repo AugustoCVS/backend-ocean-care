@@ -16,4 +16,6 @@ public interface UserService {
     public void delete(Long id);
 
     public Page<UserDto> findAll(Pageable pageable);
+
+    public UserDto findById(Long id);
 }

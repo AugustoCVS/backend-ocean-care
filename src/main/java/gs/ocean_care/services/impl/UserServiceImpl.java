@@ -55,4 +55,11 @@ public class UserServiceImpl implements UserService {
         pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
         return repository.findAll(pageable).map(UserDto::new);
     }
+
+    @Override
+    public UserDto findById(Long id) {
+        User user = repository.getReferenceById(id);
+
+        return new UserDto(user);
+    }
 }
