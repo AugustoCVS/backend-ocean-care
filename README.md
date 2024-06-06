@@ -29,7 +29,7 @@ O usuário poderá acompanhar um ranking com todas as pessoas que estão cadastr
 
 ## Backend
 
-* Link da documentação do backend com swagger, mostrando todas as rotas, como as requisições devem ser feitas e o objeto de retorno de cada requisição
+* Link da documentação do backend com swagger, mostrando todas as rotas, como as requisições devem ser feitas e o objeto de retorno de cada requisição, para fazer algum teste no swagger, lembre antes de criar uma conta, fazer login, pegar o token de retorno e liberar o acesso para realizar as requisições que precisam de autentificação
   
  https://backend-ocean-care.onrender.com/swagger-ui/index.html
 
