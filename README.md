@@ -36,3 +36,7 @@ O usuário poderá acompanhar um ranking com todas as pessoas que estão cadastr
 * Vídeo de apresentação do projeto 
 
 https://www.youtube.com/watch?v=YSh0x_xMqDU&t=7s
+
+* Vídeo PitcH
+
+https://www.youtube.com/watch?v=acxSZ0tlgv0
